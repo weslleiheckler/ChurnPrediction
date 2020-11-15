@@ -12,20 +12,19 @@ library(rpart)
 library(rattle)
 
 # ler os dados
-setwd('C:/Users/Wesllei/Downloads/Work/Data Science na Prática com R/')
+setwd('C:/Users/Wesllei/Downloads/Work/Data Science/')
 dados <- readr::read_csv('Churn_Modelling.csv', col_names = TRUE, col_types = NULL, locale = locale(encoding = "ISO-8859-2"))
 
 # análise sobre os dados
-summary(dados)
+View(dados)
 head(dados) # 6 primeiros registros
 tail(dados) # 6 últimos registros
-
-View(dados)
+summary(dados)
 
 # pré-processamento
-dados <- dados %>% mutate(Gender         = as.factor(Gender),
-                          Exited         = ifelse(Exited == 1, 'SIM', 'NAO'),
-                          Exited         = as.factor(Exited))
+dados <- dados %>% mutate(Gender = as.factor(Gender),
+                          Exited = ifelse(Exited == 1, 'SIM', 'NAO'),
+                          Exited = as.factor(Exited))
 
 summary(dados)
 
@@ -33,9 +32,6 @@ summary(dados)
 exited = dados %>% count(Exited)
 
 plot_ly(exited, labels = c('Retidos','Perdidos'), values = ~n, type = "pie", textposition = "inside", textinfo = "percent", sort = FALSE)
-
-# remover objetos da memória
-rm(exited)
 
 # quantidade de clientes retidos e perdidos por país
 geography = dados %>% count(Exited,Geography)
@@ -106,7 +102,7 @@ matrizConfusao <- confusionMatrix(classeEstimada, teste$Exited, positive = 'SIM'
 matrizConfusao
 
 # inserindo atributos relevantes
-modeloDT <- rpart(Exited ~ CreditScore + Age + Tenure + Balance + NumOfProducts + EstimatedSalary + HasCrCard + IsActiveMember + Geography + Gender, 
+modeloDT <- rpart(Exited ~ CreditScore + Gender + Age + Tenure + Balance + NumOfProducts + HasCrCard + EstimatedSalary + IsActiveMember + Geography, 
                   data = treinamento, method = "class", control = rpart.control(minsplit = 20), parms = list(split = 'Information'))
 
 classeEstimada <- predict(modeloDT, teste, "class")
